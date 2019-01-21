@@ -21,8 +21,8 @@ type AssetFSInterface interface {
 }
 
 var AssetFS AssetFSInterface = &bindataFS{
-  AssetFileSystem: &assetfs.AssetFileSystem{},
-  Path: "{{package_path}}",
+	AssetFileSystem: &assetfs.AssetFileSystem{},
+	Path: "{{package_path}}",
 	nameSpacedFS: make(map[string]*nameSpacedBindataFS, 0),
 }
 
@@ -31,30 +31,30 @@ func init() {
 }
 
 type viewPath struct {
-	Dir        string
+	Dir				 string
 	AssetPaths []string
 }
 
 type bindataFS struct {
-	Path            string
-	viewPaths       []viewPath
+	Path						string
+	viewPaths				[]viewPath
 	AssetFileSystem assetfs.Interface
-	nameSpacedFS    map[string]*nameSpacedBindataFS
+	nameSpacedFS		map[string]*nameSpacedBindataFS
 }
 
 type nameSpacedBindataFS struct {
 	*bindataFS
-	nameSpace       string
-	viewPaths       []viewPath
+	nameSpace				string
+	viewPaths				[]viewPath
 	AssetFileSystem assetfs.Interface
 }
 
 func (assetFS *bindataFS) NameSpace(nameSpace string) assetfs.Interface {
-  var nameSpacedFS *nameSpacedBindataFS
-  nameSpacedFS, ok := assetFS.nameSpacedFS[nameSpace]
-  if ok {
-    return nameSpacedFS
-  }
+	var nameSpacedFS *nameSpacedBindataFS
+	nameSpacedFS, ok := assetFS.nameSpacedFS[nameSpace]
+	if ok {
+		return nameSpacedFS
+	}
 	nameSpacedFS = &nameSpacedBindataFS{bindataFS: assetFS, nameSpace: nameSpace, AssetFileSystem: &assetfs.AssetFileSystem{}}
 	assetFS.nameSpacedFS[nameSpace] = nameSpacedFS
 	return nameSpacedFS
@@ -116,7 +116,7 @@ func (assetFS *bindataFS) Compile() error {
 	config := bindata.NewConfig()
 	config.Input = []bindata.InputConfig{
 		{
-			Path:      filepath.Join(assetFS.Path, "templates"),
+			Path:			 filepath.Join(assetFS.Path, "templates"),
 			Recursive: true,
 		},
 	}
@@ -126,7 +126,7 @@ func (assetFS *bindataFS) Compile() error {
 	config.Prefix = filepath.Join(assetFS.Path, "templates")
 	config.NoMetadata = true
 
-{{if exit_after_compile}}	defer os.Exit(0){{end}}
+{{if exit_after_compile}} defer os.Exit(0){{end}}
 	return bindata.Translate(config)
 }
 
