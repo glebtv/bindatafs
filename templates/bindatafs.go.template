@@ -20,7 +20,11 @@ type AssetFSInterface interface {
 	FileServer(dir http.Dir, assetPaths ...string) http.Handler
 }
 
-var AssetFS AssetFSInterface = &bindataFS{AssetFileSystem: &assetfs.AssetFileSystem{}, Path: "{{package_path}}"}
+var AssetFS AssetFSInterface = &bindataFS{
+  AssetFileSystem: &assetfs.AssetFileSystem{},
+  Path: "{{package_path}}",
+	nameSpacedFS: make(map[string]*nameSpacedBindataFS, 0),
+}
 
 func init() {
 	assetfs.SetAssetFS(AssetFS)
@@ -35,7 +39,7 @@ type bindataFS struct {
 	Path            string
 	viewPaths       []viewPath
 	AssetFileSystem assetfs.Interface
-	nameSpacedFS    []*nameSpacedBindataFS
+	nameSpacedFS    map[string]*nameSpacedBindataFS
 }
 
 type nameSpacedBindataFS struct {
@@ -46,8 +50,13 @@ type nameSpacedBindataFS struct {
 }
 
 func (assetFS *bindataFS) NameSpace(nameSpace string) assetfs.Interface {
-	nameSpacedFS := &nameSpacedBindataFS{bindataFS: assetFS, nameSpace: nameSpace, AssetFileSystem: &assetfs.AssetFileSystem{}}
-	assetFS.nameSpacedFS = append(assetFS.nameSpacedFS, nameSpacedFS)
+  var nameSpacedFS *nameSpacedBindataFS
+  nameSpacedFS, ok := assetFS.nameSpacedFS[nameSpace]
+  if ok {
+    return nameSpacedFS
+  }
+	nameSpacedFS = &nameSpacedBindataFS{bindataFS: assetFS, nameSpace: nameSpace, AssetFileSystem: &assetfs.AssetFileSystem{}}
+	assetFS.nameSpacedFS[nameSpace] = nameSpacedFS
 	return nameSpacedFS
 }
 
